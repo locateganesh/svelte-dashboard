@@ -11,31 +11,42 @@
     export let labels;
   
     /** @type {Function} getLabelName= - An accessor function to return the label field on your objects in the `labels` array. */
-    export let getLabelName;
+    //export let getLabelName;
   
     /** @type {Function} [formatLabelName=d => d] - An optional formatting function. */
-    export let formatLabelName = d => d;
+    //export let formatLabelName = d => d;
 
     // console.log("labels", labels, data);
+    // console.log("stackedLabels", labels[0].key);
+
+    const calcValue = (n1, n0) => {
+      if (n1 !== null && n0 !== null) {
+        return (+n1) - (+n0);
+      }
+    };
 
   </script>
+  <!-- x={$xGet(d) + $xGet.bandwidth() / 2}
+          y={$yGet(d[1]) - 10} -->
   <g class="labels">
-    {#each labels as d}
-      <text
-        class="label"
-        x={$xGet(d)}
-        y={$yGet(d)}
-      >{formatLabelName(getLabelName(d))}</text>
+    {#each labels as stack (stack.key)}
+      {#each stack as d (d.data.countries)}
+        <text
+          class="label myCustomLabel"
+          data-x={calcValue(d[1], d[0])}
+          x={$xGet(d)[1] - (calcValue(d[1], d[0]) < 10 ? 27 : 36)}
+          y={$yGet(d) + 17}
+        >
+          {calcValue(d[1], d[0]) > 7 ? Math.round(calcValue(d[1], d[0])).toString() + '%' : ''} 
+        </text>
+      {/each}
     {/each}
   </g>
   
   <style>
-    .labels {
-      pointer-events: none;
-    }
     .label {
-      position: absolute;
       font-size: 12px;
-      text-anchor: middle;
+      fill: #fff;
+      pointer-events: none;
     }
   </style>
